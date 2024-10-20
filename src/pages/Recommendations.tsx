@@ -65,8 +65,9 @@ const Recommendations: React.FC = () => {
             releaseDate={anime.aired.from ? new Date(anime.aired.from).toLocaleDateString() : 'N/A'}
             endDate={anime.aired.to ? new Date(anime.aired.to).toLocaleDateString() : 'Ongoing'}
             tags={anime.genres.map(g => g.name)}
-            synopsis={anime.synopsis}
-          />
+            synopsis={anime.synopsis} onTagClick={function (tag: string): void {
+              throw new Error('Function not implemented.');
+            } }          />
         ))}
       </div>
     </motion.div>

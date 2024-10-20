@@ -1,20 +1,27 @@
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Box, OrbitControls, Text } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Text } from '@react-three/drei';
 import { useSpring, animated } from '@react-spring/three';
 
-const AnimatedBox = ({ position, color }) => {
-  const meshRef = useRef();
-  const { scrollYProgress } = useThree();
+interface AnimatedBoxProps {
+  position: [number, number, number];
+  color: string;
+}
+
+const AnimatedBox: React.FC<AnimatedBoxProps> = ({ position, color }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const scrollRef = useRef(0); // Create a ref to store the scroll position
 
   const { scale, rotation } = useSpring({
-    scale: scrollYProgress.get() * 2 + 1,
-    rotation: scrollYProgress.get() * Math.PI * 2,
+    scale: scrollRef.current * 2 + 1,
+    rotation: scrollRef.current * Math.PI * 2,
+    config: { mass: 1, tension: 170, friction: 26 },
   });
 
   useFrame(() => {
-    const scrollProgress = scrollYProgress.get();
-    meshRef.current.position.y = position[1] + scrollProgress * 2;
+    if (meshRef.current) {
+      meshRef.current.position.y = position[1] + scrollRef.current * 2;
+    }
   });
 
   return (
@@ -25,13 +32,15 @@ const AnimatedBox = ({ position, color }) => {
   );
 };
 
-const AnimeScene3D = () => {
-  const canvasRef = useRef();
+const AnimeScene3D: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       if (canvasRef.current) {
-        canvasRef.current.__r3f.scroll.current = window.scrollY;
+        // Update the scroll position ref
+        const scrollY = window.scrollY;
+        (canvasRef.current as any).__r3f.scroll.current = scrollY;
       }
     };
 
